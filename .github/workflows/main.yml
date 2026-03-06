@@ -41,8 +41,14 @@ on:
         type: string
 
       tweak_version:
-        description: "The version of the tweak to use. Enter the version manually from dayanch96/YTLite/releases or leave default"
-        default: "5.2b3"
+        description: "Version label for the output IPA filename"
+        default: "3.0.1"
+        required: true
+        type: string
+
+      deb_url:
+        description: "Direct URL to the YTLite .deb file"
+        default: ""
         required: true
         type: string
 
@@ -141,8 +147,7 @@ jobs:
       - name: Download YouTube Plus
         id: download_ytp
         run: |
-          deb_url="https://github.com/dayanch96/YTLite/releases/download/v${{ inputs.tweak_version }}/com.dvntm.ytlite_${{ inputs.tweak_version }}_iphoneos-arm.deb"
-          wget "$deb_url" --no-verbose -O ${{ github.workspace }}/ytplus.deb
+          wget "${{ inputs.deb_url }}" --no-verbose -O ${{ github.workspace }}/ytplus.deb
 
       - name: Clone Open in YouTube (Safari extension)
         run: |
@@ -196,18 +201,16 @@ jobs:
 
       - name: Clone YTUHD
         if: ${{ inputs.enable_ytuhd }}
-        uses: actions/checkout@v4.1.7
-        with:
-          repository: PoomSmart/YTUHD
-          ref: 0f59b38817d554ab692a0053456319847a6ab1a1
-          path: ${{ github.workspace }}/YTUHD
-
+        run: |
+          cd ${{ github.workspace }}
+          git clone --quiet --depth=1 https://github.com/Tonwalter888/YTUHD.git
+          
       - name: Clone Return-YouTube-Dislikes
         if: ${{ inputs.enable_ryd }}
         run: |
           cd ${{ github.workspace }}
           git clone --quiet --depth=1 https://github.com/PoomSmart/Return-YouTube-Dislikes.git
-
+ 
       - name: Clone YouGroupSettings
         if: ${{ inputs.enable_demc }}
         run: |
